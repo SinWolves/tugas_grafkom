@@ -380,28 +380,37 @@ public class NPCInteraction : MonoBehaviour
     }
 
     void StartGiftSequence(GiftType type)
+{
+    if (giftSelectionPanel != null)
+        giftSelectionPanel.SetActive(false);
+
+    givingGift = true;
+    giftTimer = 0f;
+
+    GameObject prefab = type switch
     {
-        if (giftSelectionPanel != null)
-            giftSelectionPanel.SetActive(false);
+        GiftType.Rose => rosePrefab,
+        GiftType.Chocolate => chocolatePrefab,
+        GiftType.Sundae => sundaePrefab,
+        _ => null
+    };
 
-        givingGift = true;
-        giftTimer = 0f;
+    if (prefab == null || giftSpawnPoint == null)
+        return;
 
-        // Spawn gift visual
-        GameObject prefab = type switch
-        {
-            GiftType.Rose => rosePrefab,
-            GiftType.Chocolate => chocolatePrefab,
-            GiftType.Sundae => sundaePrefab,
-            _ => null
-        };
+    currentGift = Instantiate(prefab);
 
-        if (prefab != null && giftSpawnPoint != null)
-        {
-            currentGift = Instantiate(prefab, giftSpawnPoint.position, Quaternion.identity);
-            currentGift.transform.localScale = Vector3.one * 0.3f;
-        }
-    }
+    // PENTING: set parent dulu
+    currentGift.transform.SetParent(giftSpawnPoint, false);
+
+    // reset transform
+    currentGift.transform.localPosition = Vector3.zero;
+    currentGift.transform.localRotation = Quaternion.identity;
+
+    // KECILKAN DI SINI
+    currentGift.transform.localScale = Vector3.one * 0.05f;
+}
+
 
     void HandleGiftSequence()
     {
